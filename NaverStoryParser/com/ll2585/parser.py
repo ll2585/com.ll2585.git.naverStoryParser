@@ -2,20 +2,12 @@ import sys
 from bs4 import BeautifulSoup
 import html2text
 from urllib.request import urlopen
-import types
+import re
 
 
 #url="http://novel.naver.com/webnovel/detail.nhn?novelId=1&volumeNo=55&week=MON"
 #page=urlopen(url)
 #soup = BeautifulSoup(page.read())
-def replace_with_newlines(element):
-    text = ''
-    for elem in element.recursiveChildGenerator():
-        if isinstance(elem, types.StringTypes):
-            text += elem.strip()
-        elif elem.name == 'p':
-            text += '\n'
-    return text
 
 soup = BeautifulSoup(open('naver4.html', encoding="utf-8"))
 #soup = BeautifulSoup(u'\xa0')
@@ -27,5 +19,6 @@ for e in soup.find_all('div', attrs={'class':'detail_view_content ft15'}):
     spans = soup.find_all('span')
     for span in spans:
         span.decompose()
-    print(e.get_text())
+    text = e.get_text("\n")
+    print(text)
 
