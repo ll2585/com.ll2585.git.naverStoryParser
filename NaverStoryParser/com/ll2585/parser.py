@@ -42,7 +42,7 @@ class NaverWidget(QtGui.QWidget):
 
         grid.addWidget(textLabel, 2, 0)
         grid.addWidget(self._textBox, 2, 1, 5, 2)
-        
+         
         
         self.setLayout(grid)
 
