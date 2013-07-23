@@ -1,8 +1,6 @@
-import sys
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import re
-import sys
+
 import urllib.error
 
 from PyQt4 import QtGui
@@ -65,12 +63,6 @@ class NaverWidget(QtGui.QWidget):
         soup = BeautifulSoup(page.read())
         self._parent.statusBar().showMessage("Done!")
         
-        #soup = BeautifulSoup(open('naver4.html', encoding="utf-8"))
-        #soup = BeautifulSoup(u'\xa0')
-        #temp=soup.findAll("div",{"id":"detail_view_container"})
-        #print(page.read().decode("utf8"))
-        
-        #a_file = open('wtf.txt', encoding="utf-8")
         result = {}
         divTitle = soup.find_all('meta', attrs={'property':'og:title'})
         for titles in divTitle:
@@ -90,7 +82,6 @@ class NaverWidget(QtGui.QWidget):
         try:
             url = self._urlBox.text()
             result = self.connectToNaver(url)
-            #self.validateURL(url)
             title = result['title']
             self._titleBox.setText(title)
             text = result['text']
@@ -111,16 +102,34 @@ class MainWindow(QtGui.QMainWindow):
         
     def initUI(self):
         self.statusBar()
+        menubar = self.menuBar()
+        aboutAction = QtGui.QAction('About', self)
+        aboutAction.setStatusTip('About')
+        aboutAction.triggered.connect(self.showAbout)
+        
+        exitAction = QtGui.QAction('Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(self.close)
+        
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(aboutAction)
+        fileMenu.addAction(exitAction)
         self.setGeometry(300, 300, 550, 600)
         self.setWindowTitle('Naver Story Getter')
         self.show()
+    
+    def showAbout(self):
+        msgBox = QtGui.QMessageBox()
+        msgBox.setWindowTitle("About")
+        msgBox.setText("Copy a naver story URl into the field and press the button.\nCreated by Luke Li on July 23, 2013")
+        msgBox.exec_()
 
 def main():
     
     app = QtGui.QApplication(sys.argv)
     ex = MainWindow()
     sys.exit(app.exec_())
-#print(connectToNaver("http://novel.naver.com/webnovel/detail.nhn?novelId=63068&volumeNo=1&week=THU"))
 
 
 if __name__ == '__main__':
