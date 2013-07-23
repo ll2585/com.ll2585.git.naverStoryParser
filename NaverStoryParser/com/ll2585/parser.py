@@ -25,11 +25,13 @@ class NaverWidget(QtGui.QWidget):
 
         urlLabel = QtGui.QLabel('URL')
         goBtn = QtGui.QPushButton('Go', self)
+        titleLabel = QtGui.QLabel('Title')
         textLabel = QtGui.QLabel('Text')
         
         goBtn.clicked.connect(self.buttonClicked)
         
         self._urlBox = QtGui.QLineEdit()
+        self._titleBox = QtGui.QLineEdit()
         self._textBox = QtGui.QTextEdit()
         
         
@@ -40,9 +42,11 @@ class NaverWidget(QtGui.QWidget):
         grid.addWidget(self._urlBox, 1, 1)
         grid.addWidget(goBtn, 1, 2)
 
-        grid.addWidget(textLabel, 2, 0)
-        grid.addWidget(self._textBox, 2, 1, 5, 2)
-         
+        grid.addWidget(titleLabel, 2, 0)
+        grid.addWidget(self._titleBox, 2, 1, 1, 2)
+        
+        grid.addWidget(textLabel, 3, 0)
+        grid.addWidget(self._textBox, 3, 1, 5, 2)
         
         self.setLayout(grid)
 
@@ -67,27 +71,33 @@ class NaverWidget(QtGui.QWidget):
         #print(page.read().decode("utf8"))
         
         #a_file = open('wtf.txt', encoding="utf-8")
-        text = ""
+        result = {}
+        divTitle = soup.find_all('meta', attrs={'property':'og:title'})
+        for titles in divTitle:
+            result['title'] = titles['content']
         divText = soup.find_all('div', attrs={'class':'detail_view_content ft15'})
         if len(divText) == 0:
             raise BadURLException("Bad URL")
         for e in divText:
-            print(url)
             spans = soup.find_all('span')
             for span in spans:
                 span.decompose()
-            text += e.get_text("\n")
-        return text
+            result['text'] = e.get_text("\n")
+        return result
             
     
     def buttonClicked(self):
         try:
             url = self._urlBox.text()
+            result = self.connectToNaver(url)
             #self.validateURL(url)
-            text = self.connectToNaver(url)
+            title = result['title']
+            self._titleBox.setText(title)
+            text = result['text']
             self._textBox.setText(text)
         except BadURLException:
             msgBox = QtGui.QMessageBox()
+            msgBox.setWindowTitle("Error!")
             msgBox.setText("Invalid URL")
             msgBox.exec_()
         
@@ -101,7 +111,7 @@ class MainWindow(QtGui.QMainWindow):
         
     def initUI(self):
         self.statusBar()
-        self.setGeometry(300, 300, 350, 300)
+        self.setGeometry(300, 300, 550, 600)
         self.setWindowTitle('Naver Story Getter')
         self.show()
 
